@@ -57,7 +57,7 @@ func SaveTwemproxyConfig() {
 
 func RestartTwemproxy() error {
 	Debug("Restarting Twemproxy.")
-	args := strings.Split(Setting.RestartArgs, string(' '))
+	args := strings.Split(Settings.RestartArgs, string(' '))
 	out, err := exec.Command(Settings.RestartCommand, args...).Output()
 
 	if err != nil {
@@ -67,9 +67,19 @@ func RestartTwemproxy() error {
 	return err
 }
 
-func GetSentinel() (sentinel string) {
-	address := ComposeRedisAddress(Settings.SentinelIp, Settings.SentinelPort)
-	return address
+func GetSentinel() (redis.Conn, error) {
+	var c redis.Conn
+	var err error
+	for i := range Settings.Sentinels {
+		c, err = redis.Dial("tcp", Settings.Sentinels[i])
+		if err == nil {
+			Debug(fmt.Sprintf("Connected to sentinel %s", Settings.Sentinels[i]))
+			break;
+		}
+		Debug(fmt.Sprintf("Sentinel %s is not reachable", Settings.Sentinels[i]))
+	}
+
+	return c, err
 }
 
 func SwitchMaster(master_name string, ip string, port string) error {
@@ -84,7 +94,7 @@ func SwitchMaster(master_name string, ip string, port string) error {
 }
 
 func ValidateCurrentMaster() error {
-	c, err := redis.Dial("tcp", GetSentinel())
+	c, err := GetSentinel()
 	if err != nil {
 		return err
 	}
@@ -111,10 +121,9 @@ func ValidateCurrentMaster() error {
 }
 
 func SubscribeToSentinel() {
-	sentinel := GetSentinel()
-	c, err := redis.Dial("tcp", sentinel)
+	c, err := GetSentinel()
 	if err != nil {
-		Fatal("Cannot connect to redis sentinel:", sentinel)
+		Fatal("Cannot connect to any sentinel.")
 	}
 
 	err = ValidateCurrentMaster()
@@ -133,7 +142,15 @@ func SubscribeToSentinel() {
 		case redis.Subscription:
 			Debug(fmt.Sprintf("%s: %s %d", v.Channel, v.Kind, v.Count))
 		case error:
-			Fatal("Error with redis connection:", psc)
+			Debug("Subscription error, trying to fallback")
+			c, err = GetSentinel()
+			if err != nil {
+				Fatal("Error with redis connection:", psc)
+			}
+
+			psc = redis.PubSubConn{c}
+			Debug("Subscribing to sentinel (+switch-master).")
+			psc.Subscribe("+switch-master")
 		}
 	}
 }
