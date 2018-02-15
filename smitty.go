@@ -1,11 +1,11 @@
 package main
 
 import (
-	"github.com/areina/smitty/agent"
+	"github.com/kornrunner/smitty/agent"
 )
 
 const (
-	VERSION = "0.0.1"
+	VERSION = "0.0.3"
 )
 
 func main() {

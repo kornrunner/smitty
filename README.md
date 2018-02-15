@@ -12,7 +12,7 @@ In order to accomplish this, smitty is continuously monitoring the **+switch-mas
 
 ## Install
 
-You can get the latest [release](https://github.com/areina/smitty/releases) that includes a smitty binary,
+You can get the latest [release](https://github.com/kornrunner/smitty/releases) that includes a smitty binary,
 download and run it. 
 
 ## Configuration
@@ -23,9 +23,10 @@ file, also included in [conf/agent.yml](conf/agent.yml) could be this:
 
     twemproxy_pool_name: "root"
     twemproxy_config_file: "conf/nutcracker.yml"
-    sentinel_ip: "127.0.0.1"
-    sentinel_port: "26379"
-    restart_command: "/etc/init.d/twemproxy restart"
+    sentinels:
+      - "127.0.0.1:26379"
+    restart_command: "/etc/init.d/twemproxy"
+    restart_args: "restart"
     log_file: "agent.log"
 
 ## The name
