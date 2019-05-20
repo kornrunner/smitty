@@ -3,6 +3,7 @@ package agent
 import (
 	"fmt"
 	"github.com/garyburd/redigo/redis"
+	"os"
 	"os/exec"
 	"strings"
 )
@@ -58,7 +59,9 @@ func SaveTwemproxyConfig() {
 func RestartTwemproxy() error {
 	Debug("Restarting Twemproxy.")
 	args := strings.Split(Settings.RestartArgs, string(' '))
-	out, err := exec.Command(Settings.RestartCommand, args...).Output()
+	cmd := exec.Command(Settings.RestartCommand, args...)
+	cmd.Env = append (os.Environ(), Settings.RestartEnv)
+	out, err := cmd.Output()
 
 	if err != nil {
 		Debug(fmt.Sprintf("Cannot restart twemproxy. output: %s. error: %s", out, err))

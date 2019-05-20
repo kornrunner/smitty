@@ -13,6 +13,7 @@ type AgentSettings struct {
 	Sentinels           []string `yaml:"sentinels"`
 	RestartCommand      string `yaml:"restart_command"`
 	RestartArgs         string `yaml:"restart_args"`
+	RestartEnv          string `yaml:"restart_env"`
 	LogFile             string `yaml:"log_file"`
 }
 
