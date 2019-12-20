@@ -2,7 +2,10 @@ root:
   listen: 172.19.111.15:22121
   hash: fnv1a_64
   distribution: ketama
+  auto_eject_hosts: false
   redis: true
+  server_connections: 2
+  timeout: 500
   server_retry_timeout: 100
   server_failure_limit: 500
   servers:

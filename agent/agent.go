@@ -2,20 +2,24 @@ package agent
 
 import (
 	"fmt"
-	"github.com/garyburd/redigo/redis"
 	"os"
 	"os/exec"
 	"strings"
+
+	"github.com/garyburd/redigo/redis"
 )
 
 type TwemproxyConfig struct {
-	Listen       string   `yaml:"listen,omitempty"`
-	Hash         string   `yaml:"hash,omitempty"`
-	Distribution string   `yaml:"distribution,omitempty"`
-	Redis        bool     `yaml:"redis,omitempty"`
-	RetryTimeout int      `yaml:"server_retry_timeout,omitempty"`
-	FailureLimit int      `yaml:"server_failure_limit,omitempty"`
-	Servers      []string `yaml:"servers,omitempty"`
+	Listen            string   `yaml:"listen,omitempty"`
+	Hash              string   `yaml:"hash,omitempty"`
+	Distribution      string   `yaml:"distribution,omitempty"`
+	AutoEjectHosts    bool     `yaml:"auto_eject_hosts,omitempty"`
+	Redis             bool     `yaml:"redis,omitempty"`
+	ServerConnections int      `yaml:"server_connections,omitempty"`
+	Timeout           int      `yaml:"timeout,omitempty"`
+	RetryTimeout      int      `yaml:"server_retry_timeout,omitempty"`
+	FailureLimit      int      `yaml:"server_failure_limit,omitempty"`
+	Servers           []string `yaml:"servers,omitempty"`
 }
 
 var twemproxyConfig map[string]TwemproxyConfig
@@ -60,7 +64,7 @@ func RestartTwemproxy() error {
 	Debug("Restarting Twemproxy.")
 	args := strings.Split(Settings.RestartArgs, string(' '))
 	cmd := exec.Command(Settings.RestartCommand, args...)
-	cmd.Env = append (os.Environ(), Settings.RestartEnv)
+	cmd.Env = append(os.Environ(), Settings.RestartEnv)
 	out, err := cmd.Output()
 
 	if err != nil {
@@ -77,7 +81,7 @@ func GetSentinel() (redis.Conn, error) {
 		c, err = redis.Dial("tcp", Settings.Sentinels[i])
 		if err == nil {
 			Debug(fmt.Sprintf("Connected to sentinel %s", Settings.Sentinels[i]))
-			break;
+			break
 		}
 		Debug(fmt.Sprintf("Sentinel %s is not reachable", Settings.Sentinels[i]))
 	}

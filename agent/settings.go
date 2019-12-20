@@ -8,13 +8,13 @@ import (
 type AgentSettings struct {
 	AgentConfigFile     string
 	Verbose             bool
-	TwemproxyPoolName   string `yaml:"twemproxy_pool_name"`
-	TwemproxyConfigFile string `yaml:"twemproxy_config_file"`
+	TwemproxyPoolName   string   `yaml:"twemproxy_pool_name"`
+	TwemproxyConfigFile string   `yaml:"twemproxy_config_file"`
 	Sentinels           []string `yaml:"sentinels"`
-	RestartCommand      string `yaml:"restart_command"`
-	RestartArgs         string `yaml:"restart_args"`
-	RestartEnv          string `yaml:"restart_env"`
-	LogFile             string `yaml:"log_file"`
+	RestartCommand      string   `yaml:"restart_command"`
+	RestartArgs         string   `yaml:"restart_args"`
+	RestartEnv          string   `yaml:"restart_env"`
+	LogFile             string   `yaml:"log_file"`
 }
 
 var Settings AgentSettings = AgentSettings{}

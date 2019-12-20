@@ -1,10 +1,11 @@
 package agent
 
 import (
-	"log"
 	"fmt"
-	"os"
 	"io/ioutil"
+	"log"
+	"os"
+
 	"launchpad.net/goyaml"
 )
 
@@ -38,13 +39,13 @@ func WriteYaml(path string, obj interface{}) error {
 	if err != nil {
 		return err
 	}
-	tmp    := path + ".tmp"
+	tmp := path + ".tmp"
 	f, err := os.OpenFile(tmp, os.O_WRONLY|os.O_CREATE|os.O_SYNC, 0644)
 	if err != nil {
 		return err
 	}
 	defer f.Close()
-	
+
 	_, err = f.Write(data)
 
 	if err != nil {
